@@ -21,15 +21,21 @@ def Calculate(numbers, operators):
     if "^" in operators:
         while len(numbers) > 1 and "^" in operators:
             position = operators.index("^")
-            result = pow(int(numbers[position]), int(numbers[position+1]))
+            result = pow(float(numbers[position]), float(numbers[position+1]))
             operators, numbers = changeListElements(operators, numbers, result, position)
 
     #mnożenie i dzielenie
     if "*" in operators or "/" in operators:
         while len(numbers) > 1 and ("*" in operators or "/" in operators):
             if "*" in operators and "/" in operators:
-                if operators.index("*")<operators.index("/"): position = operators.index("*")
-                else: position = operators.index("/")
+                if operators.index("*") < operators.index("/"): #refaktor tej części kodu bo to jest żałosne że sie powtarzają dwie linijki ciągle te same
+                    position = operators.index("*")
+                    result = Multiply(numbers[position], numbers[position+1])
+                    operators, numbers = changeListElements(operators, numbers, result, position)
+                else:
+                    result = Divide(numbers[position], numbers[position+1])
+                    operators, numbers = changeListElements(operators, numbers, result, position)
+                    position = operators.index("/")
             elif "/" in operators: 
                 position = operators.index("/")
                 result = Divide(numbers[position], numbers[position+1])
@@ -47,8 +53,8 @@ def Calculate(numbers, operators):
         elif operators[0] == "-":
             result = Substract(numbers[0], numbers[1])
             operators, numbers = changeListElements(operators, numbers, result, 0)
-    print(numbers)
-    return numbers[0]  
+    print(numbers)#print tyylko do testowania, usunąć to potem
+    return numbers[0]
         
 def changeListElements(operatorsList, numbersList, result, pos):
     operatorsList.pop(pos)
@@ -57,13 +63,13 @@ def changeListElements(operatorsList, numbersList, result, pos):
     return operatorsList, numbersList
 
 def Sum(a, b):
-    return int(a)+int(b)
+    return float(a)+float(b)
 def Substract(a, b):
-    return int(a)-int(b)
+    return float(a)-float(b)
 def Multiply(a, b):
-    return int(a)*int(b)
+    return float(a)*float(b)
 def Divide(a, b):
-    if int(b)!= 0: return int(a)/int(b)
+    if float(b)!= 0: return float(a)/float(b)
     else: print("ERR!")
 
 
