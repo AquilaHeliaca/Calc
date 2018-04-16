@@ -1,6 +1,46 @@
 #Kalkulator ver 0.1.2
+import parsers 
+import calculates as Calc
 
+def nawiaskiller(number):#mocno tymczasowa nazwa zmienić jak najszybciej
+    #podzielić te gówno na mniejsze funkcje
+
+    #funkcja 1. - znajduje nawias, wyodrębnia go z reszty wyrażenia
+    startIndex = 0
+    for x in range(len(number)-1, 0, -1):
+        if number[x] == "(": 
+            startIndex = x
+            break
+    for x in range(startIndex, len(number)):
+        if number[x] == ")": 
+            endIndex = x
+            break
+    startNumber = number[:startIndex]
+    endNumber = number[endIndex+1:]
+    nawias = number[startIndex+1:endIndex]
+    print(startNumber , str(nawias), endNumber)
+    #funkcja 2. - przekazuje zawartość nawiasu do splittera, wynik do obliczeń, umieszcza wynik z powrotem w całym wyrażeniu
+    numbers, operators = Splitter(nawias)
+    nawias = Calculate(numbers, operators)
+
+    number = startNumber + str(nawias) + endNumber
+    print(startNumber , str(nawias), endNumber)
+    #********
+    
+    if "(" in number or ")" in number:#przerobić nawiaschecker zeby dało się go tu użyc a nie powtarzać kod
+        nawiaskiller(number) 
+    else:
+        numbers, operators = Splitter(number)
+        print(Calculate(numbers, operators))
+
+def nawiaschecker(number): #narazie nie działa, kod jest umieszczony w głównym ciągu poleceń sprawdzić później o chuj tu wogóle
+    if "(" in number or ")" in number:#i zrobić to działającym
+        nawiaskiller(number)
+    else:
+        globalNumbers, globalOperators = Splitter(number)
+    
 def Splitter(inputNumber):
+    """seperate numbers and operators"""
     numbers = []
     operators = []
     number = ""
@@ -17,63 +57,29 @@ def Splitter(inputNumber):
     return numbers, operators
 
 def Calculate(numbers, operators):
+    """"doing math here
+    input: numbers and operators from splitter
+    output: one number - result """
     #potęgowanie
     if "^" in operators:
-        while len(numbers) > 1 and "^" in operators:
-            position = operators.index("^")
-            result = pow(float(numbers[position]), float(numbers[position+1]))
-            operators, numbers = changeListElements(operators, numbers, result, position)
+        operators, numbers = parsers.parsePower(numbers, operators)
 
     #mnożenie i dzielenie
     if "*" in operators or "/" in operators:
-        while len(numbers) > 1 and ("*" in operators or "/" in operators):
-            if "*" in operators and "/" in operators:
-                if operators.index("*") < operators.index("/"): #refaktor tej części kodu bo to jest żałosne że sie powtarzają dwie linijki ciągle te same
-                    position = operators.index("*")
-                    result = Multiply(numbers[position], numbers[position+1])
-                    operators, numbers = changeListElements(operators, numbers, result, position)
-                else:
-                    result = Divide(numbers[position], numbers[position+1])
-                    operators, numbers = changeListElements(operators, numbers, result, position)
-                    position = operators.index("/")
-            elif "/" in operators: 
-                position = operators.index("/")
-                result = Divide(numbers[position], numbers[position+1])
-                operators, numbers = changeListElements(operators, numbers, result, position)
-            else:
-                position = operators.index("*")
-                result = Multiply(numbers[position], numbers[position+1])
-                operators, numbers = changeListElements(operators, numbers, result, position)
+        operators, numbers = parsers.parseDivideAndMultiply(numbers, operators)
 
     #dodawanie i odejmowanie
-    while len(numbers) > 1:
-        if operators[0] == "+": 
-            result = Sum(numbers[0], numbers[1])
-            operators, numbers = changeListElements(operators, numbers, result, 0)
-        elif operators[0] == "-":
-            result = Substract(numbers[0], numbers[1])
-            operators, numbers = changeListElements(operators, numbers, result, 0)
+    operators, numbers = parsers.parseSubstractAndSum(numbers, operators)
     print(numbers)#print tyylko do testowania, usunąć to potem
     return numbers[0]
-        
-def changeListElements(operatorsList, numbersList, result, pos):
-    operatorsList.pop(pos)
-    numbersList.pop(pos+1)
-    numbersList[pos] = result
-    return operatorsList, numbersList
 
-def Sum(a, b):
-    return float(a)+float(b)
-def Substract(a, b):
-    return float(a)-float(b)
-def Multiply(a, b):
-    return float(a)*float(b)
-def Divide(a, b):
-    if float(b)!= 0: return float(a)/float(b)
-    else: print("ERR!")
-
-
+globalNumbers = globalOperators = None
 a = input("Wyrażenie do obliczenia: ")
-globalNumbers, globalOperators = Splitter(a)
-print(globalNumbers, globalOperators)
-print(Calculate(globalNumbers, globalOperators))
+
+if "(" in a or ")" in a:
+    nawiaskiller(a)
+else:
+    globalNumbers, globalOperators = Splitter(a)
+    #print(globalNumbers, globalOperators)
+    print(Calculate(globalNumbers, globalOperators))
+#globalNumbers, globalOperators = Splitter(a)
