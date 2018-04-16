@@ -2,10 +2,8 @@
 import parsers 
 import calculates as Calc
 
-def nawiaskiller(number):#mocno tymczasowa nazwa zmienić jak najszybciej
-    #podzielić te gówno na mniejsze funkcje
-
-    #funkcja 1. - znajduje nawias, wyodrębnia go z reszty wyrażenia
+def bracketFinder(number):
+#funkcja 1. - znajduje nawias, wyodrębnia go z reszty wyrażenia
     startIndex = 0
     for x in range(len(number)-1, 0, -1):
         if number[x] == "(": 
@@ -18,26 +16,27 @@ def nawiaskiller(number):#mocno tymczasowa nazwa zmienić jak najszybciej
     startNumber = number[:startIndex]
     endNumber = number[endIndex+1:]
     nawias = number[startIndex+1:endIndex]
-    print(startNumber , str(nawias), endNumber)
+    print(startNumber , str(nawias), endNumber) #tymczasowe do logowania
+    number =  nawiaskurwer(nawias, startNumber, endNumber)
+    nawiaschecker(number)
+
+def nawiaskurwer(nawias, startNumber, endNumber):#NNAZWA BARDZO BARDZO TYMCZASOWA
     #funkcja 2. - przekazuje zawartość nawiasu do splittera, wynik do obliczeń, umieszcza wynik z powrotem w całym wyrażeniu
     numbers, operators = Splitter(nawias)
     nawias = Calculate(numbers, operators)
 
     number = startNumber + str(nawias) + endNumber
     print(startNumber , str(nawias), endNumber)
-    #********
-    
-    if "(" in number or ")" in number:#przerobić nawiaschecker zeby dało się go tu użyc a nie powtarzać kod
-        nawiaskiller(number) 
-    else:
-        numbers, operators = Splitter(number)
-        print(Calculate(numbers, operators))
+    return number
 
 def nawiaschecker(number): #narazie nie działa, kod jest umieszczony w głównym ciągu poleceń sprawdzić później o chuj tu wogóle
+    """"checks if bracket still present in fucking number
+        when yes function nawiaskiller start again"""
     if "(" in number or ")" in number:#i zrobić to działającym
-        nawiaskiller(number)
+        bracketFinder(number)
     else:
-        globalNumbers, globalOperators = Splitter(number)
+        numbers, operators = Splitter(number)
+        print(Calculate(numbers, operators)) #tymczasowe do logowania
     
 def Splitter(inputNumber):
     """seperate numbers and operators"""
@@ -77,7 +76,7 @@ globalNumbers = globalOperators = None
 a = input("Wyrażenie do obliczenia: ")
 
 if "(" in a or ")" in a:
-    nawiaskiller(a)
+    bracketFinder(a)
 else:
     globalNumbers, globalOperators = Splitter(a)
     #print(globalNumbers, globalOperators)
