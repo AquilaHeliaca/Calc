@@ -1,9 +1,11 @@
-#Kalkulator ver 0.1.2
+#Kalkulator ver 0.2
 import parsers 
 import calculates as Calc
+import sys
 
 def bracketFinder(number):
-#funkcja 1. - znajduje nawias, wyodrębnia go z reszty wyrażenia
+    """Isolate the bracket and pass entire divided input to nawiaskurwer
+    When expression is returned by nawiaskurwer, it's pass to nawiaschecker """
     startIndex = 0
     for x in range(len(number)-1, 0, -1):
         if number[x] == "(": 
@@ -21,7 +23,7 @@ def bracketFinder(number):
     nawiaschecker(number)
 
 def nawiaskurwer(nawias, startNumber, endNumber):#NNAZWA BARDZO BARDZO TYMCZASOWA
-    #funkcja 2. - przekazuje zawartość nawiasu do splittera, wynik do obliczeń, umieszcza wynik z powrotem w całym wyrażeniu
+    """Calculate value in bracket, then join entire math expression and return it to bracket finder"""
     numbers, operators = Splitter(nawias)
     nawias = Calculate(numbers, operators)
 
@@ -29,23 +31,26 @@ def nawiaskurwer(nawias, startNumber, endNumber):#NNAZWA BARDZO BARDZO TYMCZASOW
     print(startNumber , str(nawias), endNumber)
     return number
 
-def nawiaschecker(number): #narazie nie działa, kod jest umieszczony w głównym ciągu poleceń sprawdzić później o chuj tu wogóle
-    """"checks if bracket still present in fucking number
+def nawiaschecker(number): 
+    """checks if bracket still present in fucking number
         when yes function nawiaskiller start again"""
-    if "(" in number or ")" in number:#i zrobić to działającym
+    if "(" in number or ")" in number:
         bracketFinder(number)
     else:
         numbers, operators = Splitter(number)
-        print(Calculate(numbers, operators)) #tymczasowe do logowania
+        print(Calculate(numbers, operators)) 
     
 def Splitter(inputNumber):
     """seperate numbers and operators"""
+    inputNumber = inputNumber.replace(" ", "")
     numbers = []
     operators = []
     number = ""
     for x in range(len(inputNumber)):
         if inputNumber[x] in "1234567890.":
             number += inputNumber[x]
+        elif inputNumber[x] in ",":
+            number += "."
         elif inputNumber[x] in "+-*/^":
             numbers.append(number)
             number = ""
@@ -56,7 +61,7 @@ def Splitter(inputNumber):
     return numbers, operators
 
 def Calculate(numbers, operators):
-    """"doing math here
+    """doing math here
     input: numbers and operators from splitter
     output: one number - result """
     #potęgowanie
@@ -69,16 +74,24 @@ def Calculate(numbers, operators):
 
     #dodawanie i odejmowanie
     operators, numbers = parsers.parseSubstractAndSum(numbers, operators)
-    print(numbers)#print tyylko do testowania, usunąć to potem
     return numbers[0]
 
+#usage of sys.argv
+a = ""
+if len(sys.argv) > 1:
+    for x in range (1, len(sys.argv)):
+        a += sys.argv[x]
+else:
+    a = input("Wyrażenie do obliczenia: ")
 globalNumbers = globalOperators = None
-a = input("Wyrażenie do obliczenia: ")
-
-if "(" in a or ")" in a:
+if a.lower() == "help":
+    print("""
+    Calc ver 0.2
+    Let user do basic math: + - * /
+    You can also add to power and use brackets   
+    """)
+elif "(" in a or ")" in a:
     bracketFinder(a)
 else:
     globalNumbers, globalOperators = Splitter(a)
-    #print(globalNumbers, globalOperators)
     print(Calculate(globalNumbers, globalOperators))
-#globalNumbers, globalOperators = Splitter(a)
