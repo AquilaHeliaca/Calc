@@ -1,11 +1,10 @@
 #Kalkulator ver 0.2
 import parsers 
-import calculates as Calc
 import sys
 
-def bracketFinder(number):
-    """Isolate the bracket and pass entire divided input to nawiaskurwer
-    When expression is returned by nawiaskurwer, it's pass to nawiaschecker """
+def bracket_finder(number):
+    """Isolate the bracket and pass it to bracket_calculate()
+    When expression is returned by bracket_calculate(), the entire expression is passed to are_brackets_there() function """
     startIndex = 0
     for x in range(len(number)-1, 0, -1):
         if number[x] == "(": 
@@ -17,30 +16,29 @@ def bracketFinder(number):
             break
     startNumber = number[:startIndex]
     endNumber = number[endIndex+1:]
-    nawias = number[startIndex+1:endIndex]
-    print(startNumber , str(nawias), endNumber) #tymczasowe do logowania
-    number =  nawiaskurwer(nawias, startNumber, endNumber)
-    nawiaschecker(number)
+    bracket = number[startIndex+1:endIndex]
+    number =  bracket_calculate(bracket, startNumber, endNumber)
+    are_brackets_there(number)
 
-def nawiaskurwer(nawias, startNumber, endNumber):#NNAZWA BARDZO BARDZO TYMCZASOWA
-    """Calculate value in bracket, then join entire math expression and return it to bracket finder"""
-    numbers, operators = Splitter(nawias)
-    nawias = Calculate(numbers, operators)
+def bracket_calculate(bracket, startNumber, endNumber):
+    """Calculate value of expression in bracket, then return entire expression to bracket_finder"""
+    numbers, operators = splitter(bracket)
+    bracket = calculate(numbers, operators)
 
-    number = startNumber + str(nawias) + endNumber
-    print(startNumber , str(nawias), endNumber)
+    number = startNumber + str(bracket) + endNumber
     return number
 
-def nawiaschecker(number): 
-    """checks if bracket still present in fucking number
-        when yes function nawiaskiller start again"""
+def are_brackets_there(number): 
+    """Checks is bracket in expression
+        If yes, bracket_finder function starts again
+        If not expression is calculated and value is printed"""
     if "(" in number or ")" in number:
-        bracketFinder(number)
+        bracket_finder(number)
     else:
-        numbers, operators = Splitter(number)
-        print(Calculate(numbers, operators)) 
+        numbers, operators = splitter(number)
+        print("{0:.12f}".format(calculate(numbers, operators))) 
     
-def Splitter(inputNumber):
+def splitter(inputNumber):
     """seperate numbers and operators"""
     inputNumber = inputNumber.replace(" ", "")
     numbers = []
@@ -49,9 +47,16 @@ def Splitter(inputNumber):
     for x in range(len(inputNumber)):
         if inputNumber[x] in "1234567890.":
             number += inputNumber[x]
-        elif inputNumber[x] in ",":
+        elif inputNumber[x] == ",":
             number += "."
-        elif inputNumber[x] in "+-*/^":
+        elif inputNumber[x] == "-":
+            if x!=0:
+                if inputNumber[x-1] not in "+-*/^":
+                    operators.append("+")
+            if number != "": 
+                numbers.append(number)
+            number = "-"
+        elif inputNumber[x] in "+*/^":
             numbers.append(number)
             number = ""
             operators.append(inputNumber[x])
@@ -60,23 +65,20 @@ def Splitter(inputNumber):
     if number != "": numbers.append(number)
     return numbers, operators
 
-def Calculate(numbers, operators):
+def calculate(numbers, operators):
     """doing math here
     input: numbers and operators from splitter
     output: one number - result """
-    #potęgowanie
+    
     if "^" in operators:
-        operators, numbers = parsers.parsePower(numbers, operators)
+        operators, numbers = parsers.parse_power(numbers, operators)
 
-    #mnożenie i dzielenie
     if "*" in operators or "/" in operators:
-        operators, numbers = parsers.parseDivideAndMultiply(numbers, operators)
+        operators, numbers = parsers.parse_divide_and_multiply(numbers, operators)
 
-    #dodawanie i odejmowanie
-    operators, numbers = parsers.parseSubstractAndSum(numbers, operators)
+    operators, numbers = parsers.parse_substract_and_sum(numbers, operators)
     return numbers[0]
 
-#usage of sys.argv
 a = ""
 if len(sys.argv) > 1:
     for x in range (1, len(sys.argv)):
@@ -88,10 +90,11 @@ if a.lower() == "help":
     print("""
     Calc ver 0.2
     Let user do basic math: + - * /
-    You can also add to power and use brackets   
+    You can also raise to power and use brackets   
     """)
 elif "(" in a or ")" in a:
-    bracketFinder(a)
+    bracket_finder(a)
 else:
-    globalNumbers, globalOperators = Splitter(a)
-    print(Calculate(globalNumbers, globalOperators))
+    globalNumbers, globalOperators = splitter(a)
+    print(globalNumbers, globalOperators)
+    print("{0:.12f}".format(calculate(globalNumbers, globalOperators)))

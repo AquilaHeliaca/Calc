@@ -1,33 +1,37 @@
-import calculates as Calc
+import calculates as calc
 
-def parsePower(numbers, operators):
+def parse_power(numbers, operators):
+    """Prepare numbers for raising to power"""
     while len(numbers) > 1 and "^" in operators:
         position = operators.index("^")
         result = pow(float(numbers[position]), float(numbers[position+1]))
-        operators, numbers = changeListElements(operators, numbers, result, position)
+        operators, numbers = change_list_elements(operators, numbers, result, position)
     return operators, numbers
 
-def parseSubstractAndSum(numbers, operators):
+def parse_substract_and_sum(numbers, operators):
+    """Prepare numbers for adding and substracting"""
     while len(numbers) > 1:
         if operators[0] == "+": 
-            result = Calc.Sum(numbers[0], numbers[1])
+            result = calc.sum(numbers[0], numbers[1])
         elif operators[0] == "-":
-            result = Calc.Substract(numbers[0], numbers[1])
-        operators, numbers = changeListElements(operators, numbers, result, 0)
+            result = calc.substract(numbers[0], numbers[1])
+        operators, numbers = change_list_elements(operators, numbers, result, 0)
     return operators, numbers
 
-def parseDivideAndMultiply(numbers, operators):
+def parse_divide_and_multiply(numbers, operators):
+    """Prepare numbers for dividing and multiplying"""
     while len(numbers) > 1 and ("*" in operators or "/" in operators):
             if "*" in operators: 
                 position = operators.index("*")
-                result = Calc.Multiply(numbers[position], numbers[position+1])
+                result = calc.multiply(numbers[position], numbers[position+1])
             elif "/" in operators:
                 position = operators.index("/")
-                result = Calc.Divide(numbers[position], numbers[position+1])
-            operators, numbers = changeListElements(operators, numbers, result, position)
+                result = calc.divide(numbers[position], numbers[position+1])
+            operators, numbers = change_list_elements(operators, numbers, result, position)
     return operators, numbers
 
-def changeListElements(operatorsList, numbersList, result, pos):
+def change_list_elements(operatorsList, numbersList, result, pos):
+    """Updates list of operators and numbers"""
     operatorsList.pop(pos)
     numbersList.pop(pos+1)
     numbersList[pos] = result
