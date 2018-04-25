@@ -84,7 +84,7 @@ if len(sys.argv) > 1:
     for x in range (1, len(sys.argv)):
         a += sys.argv[x]
 else:
-    a = input("Wyrażenie do obliczenia: ")
+    a = input("Expression to calculate: ")
 globalNumbers = globalOperators = None
 if a.lower() == "help":
     print("""
